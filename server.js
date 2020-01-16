@@ -10,13 +10,7 @@ let server = net.createServer(client => {
     users.push(client);
     numberOfTotalUsers++;
     writeMessageToAllOtherUsers(`${client.name} (${client.id}) connected`, client);
-    fs.appendFile("chat.log", `${client.name} (${client.id}) connected\n`, (err) => {
-        if (err) {
-            console.log(`Error occurred: ${err}`);
-        } else {
-            console.log("Chat logged to 'chat.log'");
-        }
-    });
+    writeToChatLog(`${client.name} (${client.id}) connected\n`);
     console.log(`${client.name} (${client.id}) connected`);
 
     client.on("data", data => {
@@ -24,6 +18,25 @@ let server = net.createServer(client => {
             client.end();
         } else if (data === "/clientlist\n") {
             printClientListNames(client);
+        } else if (/^\/w/.test(data)) {
+            const whisperCommand = data.split(" ");
+            const name = whisperCommand[1];
+            const message = whisperCommand[2];
+            if (whisperCommand.length >= 3) {
+                let recipient;
+                for (let user of users) {
+                    if (user.name === name) {
+                        recipient = user;
+                    }
+                }
+                if(recipient === undefined) {
+                    client.write(`${name} is not online or name is not spelled correctly\ntry again\n`)
+                } else {
+                    recipient.write(`***\n\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`)
+                }
+            } else if (whisperCommand.length < 3) {
+                client.write("Missing argument(s) in command");
+            }
         } else {
             writeToChatLog(`${client.name} (${client.id}) said [${data.trim()}] to all other users\n`);
             client.write("Message sent to all other users");
@@ -76,9 +89,9 @@ function writeToChatLog(message, funct = () => {}) {
 function printClientListNames(client) {
     for (let user of users) {
         if (user.name === client.name) {
-            client.write(`${user.name} (you)`);
+            client.write(`${user.name} (you)\n`);
         } else {
-            client.write(user.name);
+            client.write(user.name + "\n");
         }
     }
 }
