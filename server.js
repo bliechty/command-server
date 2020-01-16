@@ -21,7 +21,8 @@ let server = net.createServer(client => {
         } else if (/^\/w/.test(data)) {
             const whisperCommand = data.split(" ");
             const name = whisperCommand[1];
-            const message = whisperCommand[2];
+            const message = whisperCommand.slice(2, whisperCommand.length).join(" ");
+            console.log("message: ", message);
             if (whisperCommand.length >= 3) {
                 let recipient;
                 for (let user of users) {
@@ -31,8 +32,12 @@ let server = net.createServer(client => {
                 }
                 if(recipient === undefined) {
                     client.write(`${name} is not online or name is not spelled correctly\ntry again\n`)
+                } else if (recipient.name === client.name) {
+                    client.write("You cannot use the /w command on yourself");
                 } else {
-                    recipient.write(`***\n\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`)
+                    writeToChatLog(`${client.name} (${client.id}) said [${message.trim()}] to: ${recipient.name} (${recipient.id})\n`);
+                    recipient.write(`***\n\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`);
+                    client.write(`Message sent to ${recipient.name}`);
                 }
             } else if (whisperCommand.length < 3) {
                 client.write("Missing argument(s) in command");
@@ -91,7 +96,7 @@ function printClientListNames(client) {
         if (user.name === client.name) {
             client.write(`${user.name} (you)\n`);
         } else {
-            client.write(user.name + "\n");
+            client.write(`${user.name}\n`);
         }
     }
 }
