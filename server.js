@@ -20,8 +20,10 @@ let server = net.createServer(client => {
     console.log(`${client.name} (${client.id}) connected`);
 
     client.on("data", data => {
-        if (data === "quit\n") {
+        if (data === "/quit\n") {
             client.end();
+        } else if (data === "/clientlist\n") {
+            printClientListNames(client);
         } else {
             writeToChatLog(`${client.name} (${client.id}) said [${data.trim()}] to all other users\n`);
             client.write("Message sent to all other users");
@@ -71,9 +73,19 @@ function writeToChatLog(message, funct = () => {}) {
     });
 }
 
+function printClientListNames(client) {
+    for (let user of users) {
+        if (user.name === client.name) {
+            client.write(`${user.name} (you)`);
+        } else {
+            client.write(user.name);
+        }
+    }
+}
+
 process.stdin.setEncoding("utf-8");
 process.stdin.on("data", data => {
-    if (data === "quit\n") {
+    if (data === "/quit\n") {
         writeToChatLog("Server disconnected\n", () => {
             process.exit();
         });

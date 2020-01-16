@@ -2,7 +2,7 @@ const net = require("net");
 
 let client = net.createConnection({port: 3000}, () => {
     console.log("Welcome!");
-    console.log("Commands: quit");
+    console.log("Commands: /quit, /clientlist");
 });
 
 client.on("data", data => {

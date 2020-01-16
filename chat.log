@@ -7,3 +7,13 @@ Client2 (370f55bc-ff0c-4ea9-844e-ee057b7ba641) connected
 Client2 (370f55bc-ff0c-4ea9-844e-ee057b7ba641) said [hello] to all other users
 Client2 (370f55bc-ff0c-4ea9-844e-ee057b7ba641) said [hello] to all other users
 Server disconnected
+Server connected
+Client1 (65bb5bdd-262f-4672-acef-c34db50fd772) connected
+Client2 (17e81af5-4bec-4ab0-bf2a-8df971fdee68) connected
+Client1 (65bb5bdd-262f-4672-acef-c34db50fd772) disconnected
+Server connected
+Client1 (2668fad5-a2fd-43a2-bc61-6a5a22491514) connected
+Client2 (bbaaa89b-3d35-4823-a7c2-ea95f70c147b) connected
+Client2 (bbaaa89b-3d35-4823-a7c2-ea95f70c147b) said [hello] to all other users
+Client1 (2668fad5-a2fd-43a2-bc61-6a5a22491514) said [/clientList] to all other users
+Server disconnected
