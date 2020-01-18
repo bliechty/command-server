@@ -9,6 +9,8 @@ let server = net.createServer(client => {
     client.name = `Client${numberOfTotalUsers + 1}`;
     users.push(client);
     numberOfTotalUsers++;
+    client.write(`
+        Hello ${client.name}!`);
     writeMessageToAllOtherUsers(`${client.name} (${client.id}) connected`, client);
     writeToChatLog(`${client.name} (${client.id}) connected\n`);
     console.log(`${client.name} (${client.id}) connected`);
@@ -22,7 +24,6 @@ let server = net.createServer(client => {
             const whisperCommand = data.split(" ");
             const name = whisperCommand[1];
             const message = whisperCommand.slice(2, whisperCommand.length).join(" ");
-            console.log("message: ", message);
             if (whisperCommand.length >= 3) {
                 let recipient;
                 for (let user of users) {
@@ -33,14 +34,32 @@ let server = net.createServer(client => {
                 if(recipient === undefined) {
                     client.write(`${name} is not online or name is not spelled correctly\ntry again\n`)
                 } else if (recipient.name === client.name) {
-                    client.write("You cannot use the /w command on yourself");
+                    client.write("You cannot use the /w command on yourself\n");
                 } else {
                     writeToChatLog(`${client.name} (${client.id}) said [${message.trim()}] to: ${recipient.name} (${recipient.id})\n`);
                     recipient.write(`***\n\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`);
-                    client.write(`Message sent to ${recipient.name}`);
+                    client.write(`Message sent to ${recipient.name}\n`);
                 }
             } else if (whisperCommand.length < 3) {
-                client.write("Missing argument(s) in command");
+                client.write("Missing argument(s) in command\n");
+            }
+        } else if (/^\/username/.test(data)) {
+            const usernameCommand = data.split(" ");
+            const name = usernameCommand[1].trim();
+            if (usernameCommand.length === 2) {
+                if (name === client.name) {
+                    client.write(`Your name is already ${client.name}`);
+                } else {
+                    writeToChatLog(`${client.name} successfully changed their name to ${name}\n`);
+                    writeMessageToAllOtherUsers(`${client.name} successfully changed their name to ${name}`, client);
+                    client.write(`You successfully changed your name to ${name}`);
+                    console.log(`${client.name} successfully changed their name to ${name}`);
+                    client.name = name;
+                }
+            } else if (usernameCommand.length < 2) {
+                client.write("Not enough arguments for this command");
+            } else if (usernameCommand.length > 2) {
+                client.write("Too many arguments for this command");
             }
         } else {
             writeToChatLog(`${client.name} (${client.id}) said [${data.trim()}] to all other users\n`);
