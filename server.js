@@ -13,9 +13,9 @@ let server = net.createServer(client => {
     client.write(`
         Hello ${client.name}!
     `);
-    writeMessageToAllOtherUsers(`${client.name} (${client.id}) connected`, client);
-    writeToChatLog(`${client.name} (${client.id}) connected\n`);
-    console.log(`${client.name} (${client.id}) connected`);
+    writeMessageToAllOtherUsers(`${client.name} connected`, client);
+    writeToChatLog(`${client.name} connected\n`);
+    console.log(`${client.name} connected`);
 
     client.on("data", data => {
         if (data === "/quit\n") {
@@ -38,9 +38,10 @@ let server = net.createServer(client => {
                 } else if (recipient.name === client.name) {
                     client.write("You cannot use the /w command on yourself\n");
                 } else {
-                    writeToChatLog(`${client.name} (${client.id}) said [${message}] to: ${recipient.name} (${recipient.id})\n`);
-                    recipient.write(`***\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`);
+                    writeToChatLog(`${client.name} said [${message}] to: ${recipient.name}\n`);
+                    recipient.write(`***\nWhisper from ${client.name}: ${message}\n***\n`);
                     client.write(`Message sent to ${recipient.name}\n`);
+                    console.log(`${client.name} said [${message}] to: ${recipient.name}`);
                 }
             } else if (whisperCommand.length < 3) {
                 client.write("Missing argument(s) in command\n");
@@ -81,7 +82,7 @@ let server = net.createServer(client => {
                         writeToChatLog(`${client.name} kicked ${recipient.name}\n`);
                         writeMessageToAllOtherUsers(`${client.name} kicked ${recipient.name}`, client);
                         client.write(`You successfully kicked ${name}`);
-                        console.log(`${client.name} kicked ${recipient.name}\n`);
+                        console.log(`${client.name} kicked ${recipient.name}`);
                         recipient.end();
                     }
                 } else {
@@ -96,10 +97,10 @@ let server = net.createServer(client => {
             const messageAllCommand = data.split(" ");
             const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
             if (messageAllCommand.length >= 2) {
-                writeToChatLog(`${client.name} (${client.id}) said [${message}] to all other users\n`);
+                writeToChatLog(`${client.name} said [${message}] to all other users\n`);
                 client.write("Message sent to all other users");
-                writeMessageToAllOtherUsers(`Message from ${client.name} (${client.id}): ${message}`, client);
-                console.log(`${client.name} (${client.id}) said [${message}] to all other users\n`);
+                writeMessageToAllOtherUsers(`Message from ${client.name}: ${message}`, client);
+                console.log(`${client.name} said [${message}] to all other users\n`);
             } else if (messageAllCommand.length < 2) {
                 client.write("Not enough arguments for this command");
             }
@@ -107,13 +108,17 @@ let server = net.createServer(client => {
             displayCommands(client);
         } else if (data === "/name\n") {
             client.write(client.name);
+        } else if (/\//.test(data)) {
+            client.write("That is not a command. Enter /commandslist to see list of commands");
+        } else {
+            client.write("To see a list of commands enter /commandslist");
         }
     });
 
     client.on("end", () => {
-        writeMessageToAllOtherUsers(`${client.name} (${client.id}) disconnected`, client);
-        writeToChatLog(`${client.name} (${client.id}) disconnected\n`);
-        console.log(`${client.name} (${client.id}) disconnected`);
+        writeMessageToAllOtherUsers(`${client.name} disconnected`, client);
+        writeToChatLog(`${client.name} disconnected\n`);
+        console.log(`${client.name} disconnected`);
         users = users.filter(user => user.id !== client.id);
     });
 });
@@ -168,9 +173,9 @@ function displayCommands(client) {
         Quit: /quit,
         List of clients: /clientlist,
         Message all other clients: /messageall (ex: /messageall Hello),
-        Whisper to user: /w (ex: /w Client5 Hello),
+        Whisper to client: /w (ex: /w Client5 Hello),
         Change username: /username (ex: /username betty),
-        Kick user: /kick (ex: /kick Client3 [admin password]),
+        Kick client: /kick (ex: /kick Client3 [admin password]),
         Commands list: /commandslist,
         See current name: /name
     `);
