@@ -78,6 +78,8 @@ let server = net.createServer(client => {
                     }
                     if (recipient === undefined) {
                         client.write(`${name} is not online or name is not spelled correctly\ntry again`)
+                    } else if (recipient.name === client.name) {
+                        client.write("You cannot kick yourself");
                     } else {
                         writeToChatLog(`${client.name} kicked ${recipient.name}\n`);
                         writeMessageToAllOtherUsers(`${client.name} kicked ${recipient.name}`, client);
@@ -108,7 +110,7 @@ let server = net.createServer(client => {
             displayCommands(client);
         } else if (data === "/name\n") {
             client.write(client.name);
-        } else if (/\//.test(data)) {
+        } else if (/^\//.test(data)) {
             client.write("That is not a command. Enter /commandslist to see list of commands");
         } else {
             client.write("To see a list of commands enter /commandslist");
