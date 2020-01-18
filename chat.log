@@ -1,14 +1,10 @@
-Server connected
-Client1 connected
-Client1 said [hello] to all other users
+Client1 successfully changed their name to ajfsej
 Server connected
 Client1 connected
 Client2 connected
-Client3 connected
-Client3 successfully changed their name to Brady
-Brady successfully changed their name to 
- successfully changed their name to Brady
-Brady said [] to all other users
-Brady kicked Client2
+Client1 said [hi] to: Client2
+Server connected
+Client1 connected
+Client2 connected
+Client1 kicked Client2
 Client2 disconnected
-Brady successfully changed their name to 
