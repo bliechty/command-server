@@ -22,11 +22,11 @@ let server = net.createServer(client => {
             client.end();
         } else if (data === "/clientlist\n") {
             printClientListNames(client);
-        } else if (/^\/w /.test(data)) {
+        } else if (/^\/w /.test(data) || data === "/w\n") {
             const whisperCommand = data.split(" ");
-            const name = whisperCommand[1];
-            const message = whisperCommand.slice(2, whisperCommand.length).join(" ").trim();
             if (whisperCommand.length >= 3) {
+                const name = whisperCommand[1];
+                const message = whisperCommand.slice(2, whisperCommand.length).join(" ").trim();
                 let recipient;
                 for (let user of users) {
                     if (user.name === name) {
@@ -46,10 +46,10 @@ let server = net.createServer(client => {
             } else if (whisperCommand.length < 3) {
                 client.write("Missing argument(s) in command\n");
             }
-        } else if (/^\/username /.test(data)) {
+        } else if (/^\/username /.test(data) || data === "/username\n") {
             const usernameCommand = data.split(" ");
-            const name = usernameCommand[1].trim();
             if (usernameCommand.length === 2) {
+                const name = usernameCommand[1].trim();
                 if (name === client.name) {
                     client.write(`Your name is already ${client.name}`);
                 } else {
@@ -64,11 +64,11 @@ let server = net.createServer(client => {
             } else if (usernameCommand.length > 2) {
                 client.write("Too many arguments for this command");
             }
-        } else if (/^\/kick /.test(data)) {
+        } else if (/^\/kick /.test(data) || data === "/kick\n") {
             const kickCommand = data.split(" ");
-            const name = kickCommand[1];
-            const password = kickCommand[2].trim();
             if (kickCommand.length === 3) {
+                const name = kickCommand[1];
+                const password = kickCommand[2].trim();
                 if (password === adminPassword) {
                     let recipient;
                     for (let user of users) {
@@ -95,10 +95,10 @@ let server = net.createServer(client => {
             } else if (kickCommand.length > 3) {
                 client.write("Too many arguments for this command");
             }
-        } else if (/^\/messageall /.test(data)) {
+        } else if (/^\/messageall /.test(data) || data === "/messageall\n") {
             const messageAllCommand = data.split(" ");
-            const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
             if (messageAllCommand.length >= 2) {
+                const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
                 writeToChatLog(`${client.name} said [${message}] to all other users\n`);
                 client.write("Message sent to all other users");
                 writeMessageToAllOtherUsers(`Message from ${client.name}: ${message}`, client);

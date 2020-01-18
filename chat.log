@@ -1,0 +1,15 @@
+Server connected
+Client1 connected
+Server connected
+Client1 connected
+Client2 connected
+Client3 connected
+Server connected
+Client1 connected
+Client2 connected
+Client3 connected
+Client3 said [hi] to all other users
+Client2 said [hi] to: Client3
+Client2 successfully changed their name to Brady
+Brady kicked Client1
+Client1 disconnected
