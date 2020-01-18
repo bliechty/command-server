@@ -22,7 +22,7 @@ let server = net.createServer(client => {
             client.end();
         } else if (data === "/clientlist\n") {
             printClientListNames(client);
-        } else if (/^\/w/.test(data)) {
+        } else if (/^\/w /.test(data)) {
             const whisperCommand = data.split(" ");
             const name = whisperCommand[1];
             const message = whisperCommand.slice(2, whisperCommand.length).join(" ").trim();
@@ -45,7 +45,7 @@ let server = net.createServer(client => {
             } else if (whisperCommand.length < 3) {
                 client.write("Missing argument(s) in command\n");
             }
-        } else if (/^\/username/.test(data)) {
+        } else if (/^\/username /.test(data)) {
             const usernameCommand = data.split(" ");
             const name = usernameCommand[1].trim();
             if (usernameCommand.length === 2) {
@@ -63,7 +63,7 @@ let server = net.createServer(client => {
             } else if (usernameCommand.length > 2) {
                 client.write("Too many arguments for this command");
             }
-        } else if (/^\/kick/.test(data)) {
+        } else if (/^\/kick /.test(data)) {
             const kickCommand = data.split(" ");
             const name = kickCommand[1];
             const password = kickCommand[2].trim();
@@ -92,7 +92,7 @@ let server = net.createServer(client => {
             } else if (kickCommand.length > 3) {
                 client.write("Too many arguments for this command");
             }
-        } else if (/^\/messageall/.test(data)) {
+        } else if (/^\/messageall /.test(data)) {
             const messageAllCommand = data.split(" ");
             const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
             if (messageAllCommand.length >= 2) {
@@ -103,6 +103,10 @@ let server = net.createServer(client => {
             } else if (messageAllCommand.length < 2) {
                 client.write("Not enough arguments for this command");
             }
+        } else if (data === "/commandslist\n") {
+            displayCommands(client);
+        } else if (data === "/name\n") {
+            client.write(client.name);
         }
     });
 
@@ -147,13 +151,29 @@ function writeToChatLog(message, funct = () => {}) {
 }
 
 function printClientListNames(client) {
+    let message = "";
     for (let user of users) {
         if (user.name === client.name) {
-            client.write(`${user.name} (you)\n`);
+            message += user.name + " (you)\n";
         } else {
-            client.write(`${user.name}\n`);
+            message += user.name + "\n";
         }
     }
+    client.write(message);
+}
+
+function displayCommands(client) {
+    client.write(`
+        Commands:
+        Quit: /quit,
+        List of clients: /clientlist,
+        Message all other clients: /messageall (ex: /messageall Hello),
+        Whisper to user: /w (ex: /w Client5 Hello),
+        Change username: /username (ex: /username betty),
+        Kick user: /kick (ex: /kick Client3 [admin password]),
+        Commands list: /commandslist,
+        See current name: /name
+    `);
 }
 
 process.stdin.setEncoding("utf-8");

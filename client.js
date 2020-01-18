@@ -8,7 +8,9 @@ let client = net.createConnection({port: 3000}, () => {
         Message all other clients: /messageall (ex: /messageall Hello),
         Whisper to user: /w (ex: /w Client5 Hello),
         Change username: /username (ex: /username betty),
-        Kick user: /kick (ex: /kick Client3 [admin password])`);
+        Kick user: /kick (ex: /kick Client3 [admin password]),
+        Commands list: /commandslist,
+        See current name: /name`);
 });
 
 client.on("data", data => {
