@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 const fs = require("fs");
 const net = require("net");
+const adminPassword = "1234adminpass";
 let users = [];
 let numberOfTotalUsers = 0;
 let server = net.createServer(client => {
@@ -10,7 +11,8 @@ let server = net.createServer(client => {
     users.push(client);
     numberOfTotalUsers++;
     client.write(`
-        Hello ${client.name}!`);
+        Hello ${client.name}!
+    `);
     writeMessageToAllOtherUsers(`${client.name} (${client.id}) connected`, client);
     writeToChatLog(`${client.name} (${client.id}) connected\n`);
     console.log(`${client.name} (${client.id}) connected`);
@@ -23,7 +25,7 @@ let server = net.createServer(client => {
         } else if (/^\/w/.test(data)) {
             const whisperCommand = data.split(" ");
             const name = whisperCommand[1];
-            const message = whisperCommand.slice(2, whisperCommand.length).join(" ");
+            const message = whisperCommand.slice(2, whisperCommand.length).join(" ").trim();
             if (whisperCommand.length >= 3) {
                 let recipient;
                 for (let user of users) {
@@ -36,8 +38,8 @@ let server = net.createServer(client => {
                 } else if (recipient.name === client.name) {
                     client.write("You cannot use the /w command on yourself\n");
                 } else {
-                    writeToChatLog(`${client.name} (${client.id}) said [${message.trim()}] to: ${recipient.name} (${recipient.id})\n`);
-                    recipient.write(`***\n\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`);
+                    writeToChatLog(`${client.name} (${client.id}) said [${message}] to: ${recipient.name} (${recipient.id})\n`);
+                    recipient.write(`***\nWhisper from ${client.name} (${client.id}): ${message}\n***\n`);
                     client.write(`Message sent to ${recipient.name}\n`);
                 }
             } else if (whisperCommand.length < 3) {
@@ -61,12 +63,46 @@ let server = net.createServer(client => {
             } else if (usernameCommand.length > 2) {
                 client.write("Too many arguments for this command");
             }
-        } else {
-            writeToChatLog(`${client.name} (${client.id}) said [${data.trim()}] to all other users\n`);
-            client.write("Message sent to all other users");
-            writeMessageToAllOtherUsers(`Message from ${client.name} (${client.id}): ${data}`, client);
-            console.log(`Message sent from ${client.name} (${client.id}) to all other users`);
-            console.log(`Message: ${data}`);
+        } else if (/^\/kick/.test(data)) {
+            const kickCommand = data.split(" ");
+            const name = kickCommand[1];
+            const password = kickCommand[2].trim();
+            if (kickCommand.length === 3) {
+                if (password === adminPassword) {
+                    let recipient;
+                    for (let user of users) {
+                        if (user.name === name) {
+                            recipient = user;
+                        }
+                    }
+                    if (recipient === undefined) {
+                        client.write(`${name} is not online or name is not spelled correctly\ntry again`)
+                    } else {
+                        writeToChatLog(`${client.name} kicked ${recipient.name}\n`);
+                        writeMessageToAllOtherUsers(`${client.name} kicked ${recipient.name}`, client);
+                        client.write(`You successfully kicked ${name}`);
+                        console.log(`${client.name} kicked ${recipient.name}\n`);
+                        recipient.end();
+                    }
+                } else {
+                    client.write("That is not the admin password");
+                }
+            } else if (kickCommand.length < 3) {
+                client.write("Not enough arguments for this command");
+            } else if (kickCommand.length > 3) {
+                client.write("Too many arguments for this command");
+            }
+        } else if (/^\/messageall/.test(data)) {
+            const messageAllCommand = data.split(" ");
+            const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
+            if (messageAllCommand.length >= 2) {
+                writeToChatLog(`${client.name} (${client.id}) said [${message}] to all other users\n`);
+                client.write("Message sent to all other users");
+                writeMessageToAllOtherUsers(`Message from ${client.name} (${client.id}): ${message}`, client);
+                console.log(`${client.name} (${client.id}) said [${message}] to all other users\n`);
+            } else if (messageAllCommand.length < 2) {
+                client.write("Not enough arguments for this command");
+            }
         }
     });
 
