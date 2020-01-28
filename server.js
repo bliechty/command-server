@@ -18,11 +18,12 @@ let server = net.createServer(client => {
     console.log(`${client.name} connected`);
 
     client.on("data", data => {
-        if (data === "/quit\n") {
+        data = data.trim();
+        if (data === "/quit") {
             client.end();
-        } else if (data === "/clientlist\n") {
+        } else if (data === "/clientlist") {
             printClientListNames(client);
-        } else if (/^\/w /.test(data) || data === "/w\n") {
+        } else if (/^\/w /.test(data) || data === "/w") {
             const whisperCommand = data.split(" ");
             if (whisperCommand.length >= 3) {
                 const name = whisperCommand[1];
@@ -50,7 +51,7 @@ let server = net.createServer(client => {
             } else if (whisperCommand.length < 3) {
                 client.write("Command incorrectly entered\nExample: /w Client5 Hello\n");
             }
-        } else if (/^\/username /.test(data) || data === "/username\n") {
+        } else if (/^\/username /.test(data) || data === "/username") {
             const usernameCommand = data.split(" ");
             if (usernameCommand.length === 2) {
                 const name = usernameCommand[1].trim();
@@ -68,7 +69,7 @@ let server = net.createServer(client => {
             } else if (usernameCommand.length < 2 || usernameCommand.length > 2) {
                 client.write("Command incorrectly entered\nExample: /username betty\n");
             }
-        } else if (/^\/kick /.test(data) || data === "/kick\n") {
+        } else if (/^\/kick /.test(data) || data === "/kick") {
             const kickCommand = data.split(" ");
             if (kickCommand.length === 3) {
                 const name = kickCommand[1];
@@ -101,7 +102,7 @@ let server = net.createServer(client => {
             } else if (kickCommand.length < 3 || kickCommand.length > 3) {
                 client.write("Command incorrectly entered\nExample: /kick Client3 [admin password]\n");
             }
-        } else if (/^\/messageall /.test(data) || data === "/messageall\n") {
+        } else if (/^\/messageall /.test(data) || data === "/messageall") {
             const messageAllCommand = data.split(" ");
             if (messageAllCommand.length >= 2) {
                 const message = messageAllCommand.slice(1, messageAllCommand.length).join(" ").trim();
@@ -117,9 +118,9 @@ let server = net.createServer(client => {
             } else if (messageAllCommand.length < 2) {
                 client.write("Command incorrectly entered\nExample: /messageall Hello\n");
             }
-        } else if (data === "/commandslist\n") {
+        } else if (data === "/commandslist") {
             displayCommands(client);
-        } else if (data === "/name\n") {
+        } else if (data === "/name") {
             client.write(client.name + "\n");
         } else if (/^\//.test(data)) {
             client.write("That is not a command. Enter /commandslist to see list of commands\n");
